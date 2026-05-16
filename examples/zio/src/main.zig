@@ -7,7 +7,7 @@ fn handleRoot(_: *http.Request, res: *http.Response) !void {
 }
 
 pub fn main(init: std.process.Init) !void {
-    var rt = try zio.Runtime.init(init.gpa, .{});
+    var rt = try zio.Runtime.init(init.gpa, .{ .executors = .auto });
     defer rt.deinit();
 
     var server = http.Server(void).init(init.gpa, rt.io(), .{}, {});
