@@ -3,6 +3,7 @@ const std = @import("std");
 const Router = @import("router.zig").Router;
 const Action = @import("router.zig").Action;
 const RequestParser = @import("parser.zig").RequestParser;
+const RequestBodyReader = @import("parser.zig").RequestBodyReader;
 const Request = @import("request.zig").Request;
 const parseHeaders = @import("request.zig").parseHeaders;
 const Response = @import("response.zig").Response;
@@ -256,8 +257,24 @@ pub fn Server(comptime Ctx: type) type {
                 };
 
                 if (!parser.isBodyComplete()) {
-                    // TODO maybe we should drain the body here?
-                    response.keepalive = false;
+                    const max = self.config.request.max_body_size;
+                    const drainable = blk: {
+                        const cl = request.headers.get("Content-Length") orelse break :blk false;
+                        const n = std.fmt.parseInt(usize, cl, 10) catch break :blk false;
+                        break :blk n <= max;
+                    };
+                    if (drainable) {
+                        var scratch: [4096]u8 = undefined;
+                        var body_reader = RequestBodyReader.init(&parser, &reader.interface, &scratch);
+                        if (body_reader.interface.discardShort(max + 1)) |consumed| {
+                            if (consumed > max) response.keepalive = false;
+                        } else |_| {
+                            if (reader.err) |e| if (e == error.Canceled) return error.Canceled;
+                            response.keepalive = false;
+                        }
+                    } else {
+                        response.keepalive = false;
+                    }
                 }
 
                 if (self.shutting_down.load(.acquire)) {
