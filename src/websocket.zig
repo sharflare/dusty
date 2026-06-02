@@ -336,7 +336,7 @@ test "WebSocket: writeFrame binary with medium length" {
     var ws = WebSocket.init(&conn_writer, &reader, std.testing.allocator, 0);
     defer ws.deinit();
 
-    const payload = "x" ** 200;
+    const payload = "x"**200;
     try ws.writeFrame(.binary, payload, true);
 
     const written = conn_writer.buffered();
@@ -504,7 +504,7 @@ test "WebSocket: readFrame rejects large control frame" {
         0x89, // FIN + ping
         126, // extended length indicator
         0x00, 0x7E, // 126 bytes
-    } ++ [_]u8{0} ** 126;
+    } ++ [_]u8{0}**126;
     var reader: std.Io.Reader = .fixed(&frame_data);
 
     var buf: [1024]u8 = undefined;
