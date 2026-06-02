@@ -634,7 +634,7 @@ test "Server: closes connection when unread body exceeds max_body_size" {
     var reader = stream.reader(io, &read_buf);
     const r = &reader.interface;
 
-    const body = "x" ** 200;
+    const body = "x"**200;
     try w.print("POST /ignore HTTP/1.1\r\nHost: localhost\r\nContent-Length: {d}\r\n\r\n{s}", .{ body.len, body });
     try w.flush();
 
