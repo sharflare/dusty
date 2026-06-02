@@ -547,7 +547,7 @@ test "Request.body: large body over 128 bytes" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const body_content = "A" ** 256;
+    const body_content = "A"**256;
     const raw_request = "POST /test HTTP/1.1\r\nContent-Length: 256\r\n\r\n" ++ body_content;
     var reader = std.Io.Reader.fixed(raw_request);
 
