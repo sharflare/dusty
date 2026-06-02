@@ -351,7 +351,7 @@ const allowed_header_name_bytes = "!#$%&'*+-.^_`|~" ++
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 const tchar_table: [256]bool = blk: {
-    var table = [_]bool{false} ** 256;
+    var table = [_]bool{false}**256;
     for (allowed_header_name_bytes) |byte| table[byte] = true;
     break :blk table;
 };
